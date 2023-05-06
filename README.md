@@ -15,9 +15,9 @@ a simple C web serving library
 int main(void) {
   listen (80)
     route {
-      GET(/): fprintf(netout, "<h1>index!</h1>\n<a href=\"/foo\">go to foo</a>\n");
-      GET(/foo): fprintf(netout, "<h1>foo!</h1>\n<a href=\"/bar\">go to bar</a>\n");
-      GET(/bar): fprintf(netout, "<h1>bar!</h1>\n<a href=\"/\">go to index</a>\n");
+      GET("/"): fprintf(netout, "<h1>index!</h1>\n<a href=\"/foo\">go to foo</a>\n");
+      GET("/foo"): fprintf(netout, "<h1>foo!</h1>\n<a href=\"/bar\">go to bar</a>\n");
+      GET("/bar"): fprintf(netout, "<h1>bar!</h1>\n<a href=\"/\">go to index</a>\n");
     } else {
       fprintf(netout, "<h1>404!</h1>\n");
     }
