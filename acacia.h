@@ -1,6 +1,6 @@
 #ifndef OTESUNKI_ACACIA_H
 #define OTESUNKI_ACACIA_H
-#define OTESUNKI_ACACIA_VER 1,0,0
+#define OTESUNKI_ACACIA_VER 0,1,0
   #include <unistd.h>
   #include <stdio.h>
   #include <stdlib.h>
