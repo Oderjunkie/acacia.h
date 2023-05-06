@@ -1,6 +1,7 @@
 #ifndef OTESUNKI_ACACIA_H
 #define OTESUNKI_ACACIA_H
-#define OTESUNKI_ACACIA_VER 0,0,0
+#define OTESUNKI_ACACIA_VER 0,1,0
+  #include <unistd.h>
   #include <stdio.h>
   #include <stdlib.h>
   #include <setjmp.h>
@@ -40,7 +41,26 @@
     char path[],
     struct ConnectionAcacia *connection
   ) {
-    return connection->method == method && !strcmp(connection->path, path);
+    if (connection->method != method)
+      return 0;
+    
+    char *matcher, *matched;
+    for (
+      matcher = path, matched = connection->path;
+      *matcher && *matched;
+      matcher++, matched++
+    ) {
+      if (*matcher == '*') {
+        if (matcher[1] == '*' && matcher[2] == '\0')
+          return 1;
+        while (*matched != '/' && *matched != '\0')
+          matched++;
+        matched--;
+      } else if (*matcher != *matched)
+        break;
+    }
+    
+    return *matcher == *matched;
   }
   
   static inline void getnextrequest_acacia(struct ConnectionAcacia *connection) {
@@ -76,7 +96,7 @@
       fprintf(stderr, "\x1b[31m[ACACIA x0c] Failed to read line from browser's request! (%s)\x1b[0m\n", strerror(errno)),
       exit(EXIT_FAILURE);
     
-    if (sscanf(buf, "%32s %128s HTTP/%d.%d", reqmth, reqpth, &majver, &minver) == NULL)
+    if (sscanf(buf, "%32s %128s HTTP/%d.%d", reqmth, reqpth, &majver, &minver) == 0)
       fprintf(stderr, "\x1b[31m[ACACIA x0c] Failed to parse browser's request! (%s)\x1b[0m\n", strerror(errno)),
       exit(EXIT_FAILURE);
     
@@ -91,11 +111,11 @@
     FILE *rawnetout;
     
     if (fclose(netout) == EOF)
-      fprintf(stderr, "\x1b[31m[ACACIA x0b] Failed to close `netout`! (netout = %p, %s)\x1b[0m\n", netout, strerror(errno)),
+      fprintf(stderr, "\x1b[31m[ACACIA x0b] Failed to close `netout`! (netout = %p, %s)\x1b[0m\n", (void *) netout, strerror(errno)),
       exit(EXIT_FAILURE);
     
     if (fclose(netin) == -1)
-      fprintf(stderr, "\x1b[31m[ACACIA x08] Failed to close `netin`! (netin = %p, %s)\x1b[0m\n", netin, strerror(errno)),
+      fprintf(stderr, "\x1b[31m[ACACIA x08] Failed to close `netin`! (netin = %p, %s)\x1b[0m\n", (void *) netin, strerror(errno)),
       exit(EXIT_FAILURE);
     
     if ((rawnetout = fdopen(netfd, "w")) == NULL)
@@ -108,10 +128,10 @@
       "Content-type: text/html\n"
       "Content-Length: %d\n"
       "\n"
-      "%s", strlen(netbuf), netbuf);
+      "%s", (int) strlen(netbuf), netbuf);
     
     if (fclose(rawnetout) == -1)
-      fprintf(stderr, "\x1b[31m[ACACIA x0a] Failed to close file! (file = %p, %s)\x1b[0m\n", rawnetout, strerror(errno)),
+      fprintf(stderr, "\x1b[31m[ACACIA x0a] Failed to close file! (file = %p, %s)\x1b[0m\n", (void *) rawnetout, strerror(errno)),
       exit(EXIT_FAILURE);
   
     if (connection->path)
@@ -165,7 +185,7 @@
   #define TRACE(path) HTTP(TRACEAH, path)
   #define PATCH(path) HTTP(PATCHAH, path)
   #define HTTP(method, path) \
-    if (!matchrequest_acacia((method), #path, connection)) (void) 0; else \
+    if (!matchrequest_acacia((method), path, connection)) (void) 0; else \
     for (;;longjmp(_serve_end, 1)) \
     switch (0) case 0
   
