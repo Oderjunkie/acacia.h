@@ -13,11 +13,14 @@
 #else
   #include <unistd.h>
   #include <arpa/inet.h>
+  #include <sys/socket.h>
 #endif
 
   #include <stdio.h>
   #include <stdlib.h>
+  #include <errno.h>
   #include <setjmp.h>
+  #include <string.h>
   
   extern FILE *netin;
   extern FILE *netout;
@@ -38,12 +41,6 @@
     enum HttpMethodAcacia method;
     char *path;
   };
-  
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <errno.h>
-  #include <sys/socket.h>
-  #include <string.h>
   
   FILE *netin = NULL;
   FILE *netout = NULL;
