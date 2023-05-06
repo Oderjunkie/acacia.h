@@ -255,10 +255,14 @@
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
     
-    if (getaddrinfo(NULL, DEFAULT_PORT, &hints, &result) != 0) 
-      fprintf(stderr, "\x1b[31m[ACACIA x0f] Failed to get address info! (WSA: %ld)\x1b[0m\n", WSAGetLastError()),
-      WSACleanup(),
-      exit(EXIT_FAILURE);
+    {
+      char port_buf[128];
+      snprintf(port_buf, sizeof(port_buf), "%d", port);
+      if (getaddrinfo(NULL, port_buf, &hints, &result) != 0) 
+        fprintf(stderr, "\x1b[31m[ACACIA x0f] Failed to get address info! (WSA: %ld)\x1b[0m\n", WSAGetLastError()),
+        WSACleanup(),
+        exit(EXIT_FAILURE);
+    }
     
     connection->ListenSocket = INVALID_SOCKET;
     
