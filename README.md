@@ -18,6 +18,8 @@ int main(void) {
       GET("/"): fprintf(netout, "<h1>index!</h1>\n<a href=\"/foo\">go to foo</a>\n");
       GET("/foo"): fprintf(netout, "<h1>foo!</h1>\n<a href=\"/bar\">go to bar</a>\n");
       GET("/bar"): fprintf(netout, "<h1>bar!</h1>\n<a href=\"/\">go to index</a>\n");
+      /* use connection->path to refer to the path currently requested */
+      GET("/baz/**"): fprintf(netout, "<h1>baz! (from %s)</h1>\n<a href=\"/\">go to index</a>\n", connection->path);
     } else {
       fprintf(netout, "<h1>404!</h1>\n");
     }
