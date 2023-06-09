@@ -94,10 +94,12 @@
       if (ferror(netin))
         fprintf(stderr, "\x1b[31m[ACACIA x0c] Failed to read line from browser's request! (%s)\x1b[0m\n", strerror(errno)),
         exit(EXIT_FAILURE);
-      else if (feof(netin))
+      else if (feof(netin)) {
         fprintf(stderr, "\x1b[33m[ACACIA x0e] Hit EOF reading browser's request?\x1b[0m\n", strerror(errno)),
-        exit(EXIT_FAILURE);
-      else
+        connection->method = UNKAH;
+        connection->path = "";
+        return;
+      } else
         fprintf(stderr, "\x1b[31m[ACACIA x0f] Unreachable condition. (fgets returned NULL, didn't mark EOF nor error)\n"),
         exit(EXIT_FAILURE);
     
